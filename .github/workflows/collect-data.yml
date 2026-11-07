@@ -1,0 +1,114 @@
+name: Collect Economic Data Snapshots
+
+on:
+  schedule:
+    # Daily run at 15:00 UTC (10:00 AM EST / 11:00 AM EDT, after typical morning economic releases)
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+    inputs:
+      series:
+        description: 'Specific series codes (space-separated, e.g., "CPI UNRATE") or empty for all active series'
+        required: false
+        default: ''
+        type: string
+      full_refresh:
+        description: 'Force a full refresh from FRED/ALFRED instead of incremental'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-data
+  cancel-in-progress: false
+
+jobs:
+  collect-and-commit:
+    name: Collect and Commit Snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Check FRED API Key Secret
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ -z "$FRED_API_KEY" ]; then
+            echo "::error::FRED_API_KEY secret is missing or empty. Please configure it in Repository Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+      - name: Run Snapshot Collection
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          CMD="python -m econ_monitor.cli snapshot"
+          if [ "${{ inputs.full_refresh }}" = "true" ]; then
+            CMD="$CMD --full"
+          fi
+          if [ -n "${{ inputs.series }}" ]; then
+            CMD="$CMD --series ${{ inputs.series }}"
+          fi
+          echo "Executing: $CMD"
+          eval $CMD
+
+      - name: Validate Snapshot Manifest
+        run: |
+          if [ ! -f "data/snapshots/manifest.json" ]; then
+            echo "::error::Snapshot manifest data/snapshots/manifest.json does not exist after collection!"
+            exit 1
+          fi
+          echo "Manifest exists and is valid."
+
+      - name: Generate GitHub Actions Step Summary
+        run: |
+          echo "### 📊 Economic Data Snapshot Collection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Execution Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "data/snapshots/manifest.json" ]; then
+            echo "#### Manifest Overview" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat data/snapshots/manifest.json >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Commit and Push Snapshot Updates
+        run: |
+          # Configure GitHub Actions bot identity
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage ONLY the data/snapshots directory
+          git add data/snapshots/
+
+          # Check if there are staged changes
+          if git diff --staged --quiet; then
+            echo "No changes in data/snapshots/ to commit."
+          else
+            echo "Changes detected in data/snapshots/. Committing..."
+            git commit -m "data: update snapshots [skip ci]"
+            # Pull with rebase to ensure clean linear history against upstream
+            git pull --rebase origin ${{ github.ref_name }}
+            git push origin ${{ github.ref_name }}
+            echo "Successfully pushed updated snapshots."
+          fi

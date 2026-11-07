@@ -1,0 +1,36 @@
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Secrets and environment configurations
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Local data (do NOT ignore data/snapshots/)
+data/local/
+*.sqlite
+*.db
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

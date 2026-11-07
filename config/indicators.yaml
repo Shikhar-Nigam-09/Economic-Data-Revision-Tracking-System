@@ -1,0 +1,98 @@
+indicators:
+  - code: GDP
+    fred_series_id: GDPC1
+    display_name: "Real Gross Domestic Product"
+    category: "National Accounts"
+    active: true
+    anomaly_transform: pct_change
+    expected_min: 0.0
+    expected_max: 200000.0
+    max_stale_lag_days: 130
+    initial_release_max_lag_days: 150
+    history_start: "1990-01-01"
+    change_unit_label: "Billions of Chained Dollars"
+    notes: "Real GDP, seasonally adjusted annual rate (Quarterly)"
+
+  - code: CPI
+    fred_series_id: CPIAUCSL
+    display_name: "CPI for All Urban Consumers: All Items, Seasonally Adjusted"
+    category: "Prices & Inflation"
+    active: true
+    anomaly_transform: pct_change
+    expected_min: 0.0
+    expected_max: 2000.0
+    max_stale_lag_days: 60
+    initial_release_max_lag_days: 90
+    history_start: "1990-01-01"
+    change_unit_label: "index points"
+    notes: "Consumer price index, all urban consumers (Monthly)"
+
+  - code: UNRATE
+    fred_series_id: UNRATE
+    display_name: "Unemployment Rate"
+    category: "Labor Market"
+    active: true
+    anomaly_transform: diff
+    expected_min: 0.0
+    expected_max: 30.0
+    max_stale_lag_days: 45
+    initial_release_max_lag_days: 90
+    history_start: "1990-01-01"
+    change_unit_label: "percentage points"
+    notes: "Civilian unemployment rate in percent (Monthly)"
+
+  - code: INDPRO
+    fred_series_id: INDPRO
+    display_name: "Industrial Production: Total Index"
+    category: "Production"
+    active: true
+    anomaly_transform: pct_change
+    expected_min: 0.0
+    expected_max: 300.0
+    max_stale_lag_days: 60
+    initial_release_max_lag_days: 90
+    history_start: "1990-01-01"
+    change_unit_label: "index points"
+    notes: "Industrial production index, 2017=100 (Monthly)"
+
+  - code: RETAIL_SALES
+    fred_series_id: RSAFS
+    display_name: "Advance Retail Sales: Retail Trade and Food Services"
+    category: "Sales & Consumption"
+    active: true
+    anomaly_transform: pct_change
+    expected_min: 0.0
+    expected_max: 10000000.0
+    max_stale_lag_days: 60
+    initial_release_max_lag_days: 90
+    history_start: "1990-01-01"
+    change_unit_label: "Millions of Dollars"
+    notes: "Advance retail trade and food services (Monthly)"
+
+  - code: PAYEMS
+    fred_series_id: PAYEMS
+    display_name: "Total Nonfarm Payrolls"
+    category: "Labor Market"
+    active: false
+    anomaly_transform: diff
+    expected_min: 0.0
+    expected_max: 300000.0
+    max_stale_lag_days: 45
+    initial_release_max_lag_days: 90
+    history_start: "1990-01-01"
+    change_unit_label: "Thousands of Persons"
+    notes: "Inactive by default; demonstrates config-driven extension for nonfarm payrolls"
+
+  - code: REAL_GDP_GROWTH
+    fred_series_id: A191RL1Q225SBEA
+    display_name: "Real Gross Domestic Product, Percent Change from Preceding Period"
+    category: "National Accounts"
+    active: false
+    anomaly_transform: diff
+    expected_min: -50.0
+    expected_max: 50.0
+    max_stale_lag_days: 130
+    initial_release_max_lag_days: 150
+    history_start: "1990-01-01"
+    change_unit_label: "percentage points"
+    notes: "Inactive by default; quarterly percent change SAAR"

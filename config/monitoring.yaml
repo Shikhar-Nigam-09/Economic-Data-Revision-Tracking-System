@@ -1,0 +1,51 @@
+# Data Quality Scoring Configuration (Weights must sum to 100)
+quality:
+  weights:
+    completeness: 25
+    validity: 20
+    uniqueness: 10
+    frequency_consistency: 15
+    timeliness: 20
+    schema_conformance: 10
+  thresholds:
+    healthy_score_min: 80.0
+    degraded_score_min: 60.0
+
+# Anomaly Detection Parameters
+anomalies:
+  zscore:
+    threshold: 3.0
+  isolation_forest:
+    n_estimators: 200
+    contamination: 0.02
+    random_state: 42
+  windows:
+    M: 12
+    Q: 8
+    A: 5
+  min_history_required:
+    M: 60
+    Q: 40
+    A: 30
+
+# Notification Engine Settings
+notifications:
+  defaults:
+    notify_new_observation: false
+    notify_revision: true
+    notify_anomaly: true
+    notify_quality_issue: false
+  max_retry_attempts: 3
+  rate_limit_pause_seconds: 1.0
+
+# Supported Native Observation Frequencies and Pandas Grid Offsets
+frequencies:
+  M:
+    name: "Monthly"
+    offset: "MS"
+  Q:
+    name: "Quarterly"
+    offset: "QS"
+  A:
+    name: "Annual"
+    offset: "YS"

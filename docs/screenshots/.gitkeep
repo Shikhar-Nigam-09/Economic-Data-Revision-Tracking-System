@@ -1,0 +1,11 @@
+# This directory is reserved for screenshots of the 9 Streamlit dashboard pages.
+# Refer to docs/SCREENSHOTS.md for the capture guide and naming conventions:
+# - 01_overview.png
+# - 02_indicators.png
+# - 03_observations.png
+# - 04_revisions.png
+# - 05_analytics.png
+# - 06_anomalies.png
+# - 07_quality.png
+# - 08_subscribers.png
+# - 09_notifications.png
